@@ -73,7 +73,7 @@ void oddzielnie() {
     std::cout << mapy[rand() % 12] << "\n";
 
     std::cout << "Kliknij dowolny klawisz by kontynuowac\n";
-    std::cin::ignore();
+    std::cin.ignore();
     std::cin.get();
 }
 

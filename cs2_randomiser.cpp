@@ -15,8 +15,8 @@ TODO:
 
 using std::string;
 
+const uint8_t name_length = 255;
 uint16_t temp_num_players;
-std::vector<Player> players;
 
 struct Player {
     string Name;
@@ -24,8 +24,10 @@ struct Player {
     string Ct_secondary;
     string Terro_primary;
     string Ct_primary;
-    bool Team_ct;
+    bool Team_ct = false;
 };
+
+std::vector<Player> players;
 
 bool in_array(const std::string& value, const std::vector<std::string>& array) {
     return std::find(array.begin(), array.end(), value) != array.end();
@@ -51,39 +53,46 @@ int get_rand_index(int min, int max) {
 void add_players() {
     string str_num_players;
 
+    std::cout << "\n";
+    std::cin.ignore();
     do {
         std::cout << "Enter number of players ";
         std::cin >> str_num_players;
     }
     while(is_integer(str_num_players));
 
-    if(players.size() == 0)
-        std::vector<Player> players(temp_num_players);
-
-    else {
-        for(size_t i = 0; i < temp_num_players; i++)
-            players.emplace_back();
-    }
-
     std::cin.ignore();
+
+    for(size_t i = 0; i < temp_num_players; i++) {
+        Player p;
+        std::unique_ptr<char[]> temp_text(new char[name_length]);
+
+        std::cout << "\nEnter player No." << i+1 << " name ";
+        std::cin.getline(temp_text.get(), name_length);
+        p.Name = (temp_text.get() ? temp_text.get() : "");
+        players.emplace_back(p);
+    }
 }
 
 void del_player() {
+    std::cout << "\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
     }
 
-    string player_name;
+    std::cin.ignore();
+
+    std::unique_ptr<char[]> player_name(new char[name_length]);
 
     std::cout << "Enter name of a player you want to delete\n";
     for(size_t i = 0; i < players.size(); i++) {
         std::cout << players[i].Name << "\n";
     }
 
-    std::cin >> player_name;
+    std::cin.getline(player_name.get(), name_length);
     auto it = std::find_if(players.begin(), players.end(),
-    [&](const Player& p) { return p.Name == player_name; });
+    [&](const Player& p) { return p.Name == player_name.get(); });
 
     if (it != players.end()) {
         players.erase(it);
@@ -95,41 +104,35 @@ void del_player() {
 }
 
 void rand_weapons_separately() {
+    std::cout << "\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
     }
 
-    const uint8_t name_length = 255;
-    std::unique_ptr<char[]> temp_text(new char[name_length]);
-    
     //randomising weapons for players
     for(size_t i = 0; i < players.size(); i++) {
-        std::cout << "\nEnter player No." << i+1 << " name ";
-        
-        std::cin.getline(temp_text.get(), name_length);
-        players[i].name = (temp_text.get() ? temp_text.get() : "");
-
         players[i].Terro_secondary = terro_secondary[get_rand_index(0, 6)];
         players[i].Ct_secondary = ct_secondary[get_rand_index(0, 7)];
         players[i].Terro_primary = terro_primary[get_rand_index(0, 16)];
         players[i].Ct_primary = ct_primary[get_rand_index(0, 17)];
     }
 
-    std::cout << "\n";
-
     //printing
     for(size_t i = 0; i < players.size(); i++) {
-        std::cout << players[i].name << ": \nt: " << players[i].terro_secondary << ", " << players[i].terro_primary
-                                     << "\nct: " << players[i].ct_secondary << ", " << players[i].ct_primary << "\n\n";
+        std::cout << players[i].Name << ": \nt: " << players[i].Terro_secondary << ", " << players[i].Terro_primary
+                                     << "\nct: " << players[i].Ct_secondary << ", " << players[i].Ct_primary << "\n\n";
     }
 }
 
 void rand_weapons_together() {
+    std::cout << "\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
     }
+
+    std::cin.ignore();
 
     string rand_gun;
     std::vector<string> t_arr(5);   //terrorist
@@ -186,19 +189,22 @@ void rand_weapons_together() {
 }
 
 void rand_team() {
+    std::cout << "\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
     }
 
-    int half_of_players;
+    float half_of_players;
+    for(size_t i = 0; i < players.size(); i++)
+        players[i].Team_ct = false;
+
 
     //determinate if round up or down
     if(get_rand_index(0, 1))
-        half_of_players = floor(players.size()/2);
+        half_of_players = floor((float)players.size()/2);
     else
-        half_of_players = ceil(players.size()/2);
-
+        half_of_players = ceil((float)players.size()/2);
 
     //set first player to team ct
     int rand_player = get_rand_index(0, players.size()-1);
@@ -231,13 +237,14 @@ void rand_team() {
 }
 
 void rand_maps() {
+    std::cout << "\n";
     std::cout << maps[get_rand_index(0, 12)] << "\n";
 }
 
 int main() {
     string n;
     while(true) {
-        std::cout << "\nChoose option(exit - exit program; add - add players; del - delete player; 2 - randomise weapons for everyone separately; 3 - randomise weapons for everyone together; 4 - randomise team; 5 - randomise map)\n";
+        std::cout << "\nChoose option(exit - exit program; add - add players; del - delete player; 1 - randomise weapons for everyone separately; 2 - randomise weapons for everyone together; 3 - randomise team; 4 - randomise map)\n";
         std::cin >> n;
 
         if(n.compare("exit") == 0)      return 0;

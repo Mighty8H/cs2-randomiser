@@ -12,6 +12,7 @@ bool in_array(const std::string& value, const std::vector<std::string>& array);
 bool is_integer(const std::string& str);
 int get_rand_int(int min, int max);
 void add_players();
+void del_player();
 void rand_weapons_separately();
 void rand_weapons_together();
 void rand_team();

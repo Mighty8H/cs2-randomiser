@@ -11,7 +11,6 @@
 /*
 TODO: 
 - 1/1000 zeus chance instead of primary
-- add del_player function
 */
 
 using std::string;
@@ -70,7 +69,29 @@ void add_players() {
 }
 
 void del_player() {
-    
+    if(players.empty()) {
+        std::cerr << "no player exists\n";
+        return;
+    }
+
+    string player_name;
+
+    std::cout << "Enter name of a player you want to delete\n";
+    for(size_t i = 0; i < players.size(); i++) {
+        std::cout << players[i].Name << "\n";
+    }
+
+    std::cin >> player_name;
+    auto it = std::find_if(players.begin(), players.end(),
+    [&](const Player& p) { return p.Name == player_name; });
+
+    if (it != players.end()) {
+        players.erase(it);
+        std::cout << "Player deleted\n";
+    } 
+    else {
+        std::cerr << "Player not found\n";
+    }
 }
 
 void rand_weapons_separately() {

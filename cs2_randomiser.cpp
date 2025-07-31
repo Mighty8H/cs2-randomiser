@@ -8,11 +8,6 @@
 #include <cmath>
 #include "cs2_randomiser.hpp"
 
-/*
-TODO: 
-- 1/1000 zeus chance instead of primary
-*/
-
 using std::string;
 
 const uint8_t name_length = 255;

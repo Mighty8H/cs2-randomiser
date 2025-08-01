@@ -40,7 +40,7 @@ bool is_integer(const std::string& str) {
 }
 
 int get_rand_int(int min, int max) {
-    return min + (int) ((max+1.0) * (rand() / (RAND_MAX + 1.0)));
+    return min + (int)((max+1.0) * (rand() / (RAND_MAX + 1.0)));
 }
 
 void add_players() {
@@ -96,10 +96,12 @@ void del_player() {
         std::cout << players[i].Name << "\n";
     }
 
+    //finding player with that name
     std::cin.getline(player_name.get(), name_length);
     auto it = std::find_if(players.begin(), players.end(),
     [&](const Player& p) { return p.Name == player_name.get(); });
 
+    //deleting player
     if(it != players.end()) {
         players.erase(it);
         std::cout << "Player deleted\n";
@@ -210,6 +212,8 @@ void rand_team() {
     }
 
     float half_of_players;
+
+    //set all players' teams to false
     for(size_t i = 0; i < players.size(); i++)
         players[i].Team_ct = false;
 
@@ -252,9 +256,7 @@ void rand_team() {
 }
 
 void rand_maps() {
-    std::cout << "\n";
-    std::cout << maps[get_rand_int(0, 13)] << "\n";
-    std::cout << "\n";
+    std::cout << "\n" << maps[get_rand_int(0, 13)] << "\n\n";
 }
 
 int main() {

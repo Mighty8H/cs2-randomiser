@@ -20,6 +20,7 @@ struct Player {
     string Terro_primary;
     string Ct_primary;
     bool Team_ct = false;
+    
 };
 
 std::vector<Player> players;
@@ -99,7 +100,7 @@ void del_player() {
     //finding player with that name
     std::cin.getline(player_name.get(), name_length);
     auto it = std::find_if(players.begin(), players.end(),
-    [&](const Player& p) { return p.Name == player_name.get(); });
+        [&](const Player& p) { return p.Name == player_name.get(); });
 
     //deleting player
     if(it != players.end()) {
@@ -133,12 +134,11 @@ void rand_weapons_separately() {
             players[i].Ct_primary = "Zeus x27";
         else
             players[i].Ct_primary = ct_primary[get_rand_int(0, 17)];
-            
     }
 
     //printing
     for(size_t i = 0; i < players.size(); i++) {
-        std::cout << players[i].Name << ": \nt: " << players[i].Terro_secondary << ", " << players[i].Terro_primary
+        std::cout << players[i].Name << ": \nt:  " << players[i].Terro_secondary << ", " << players[i].Terro_primary
                                      << "\nct: " << players[i].Ct_secondary << ", " << players[i].Ct_primary << "\n\n";
     }
     std::cout << "\n";
@@ -198,9 +198,54 @@ void rand_weapons_together() {
     }
     
     //printing
-    std::cout << "t: " << t_arr[0] << ", " << t_arr[1] << "; " << t_arr[2] << ", " << t_arr[3] << ", " << t_arr[4] << "\n"
+    std::cout << "t:  " << t_arr[0] << ", " << t_arr[1] << "; " << t_arr[2] << ", " << t_arr[3] << ", " << t_arr[4] << "\n"
               << "ct: " << ct_arr[0] << ", " << ct_arr[1] << "; " << ct_arr[2] << ", " << ct_arr[3] << ", " << ct_arr[4] << "\n";
     
+    std::cout << "\n";
+}
+
+void rand_weapons_individualy() {
+    std::cout << "\n";
+    if(players.empty()) {
+        std::cerr << "no player exists\n";
+        return;
+    }
+
+    std::cin.ignore();
+
+    std::unique_ptr<char[]> player_name(new char[name_length]);
+
+    std::cout << "Enter the name of the player you want to roll for:\n";
+    for(const auto& player : players) {
+        std::cout << player.Name << "\n";
+    }
+
+    //finding player with that name
+    std::cin.getline(player_name.get(), name_length);
+    auto it = std::find_if(players.begin(), players.end(),
+        [&](const Player& p) { return p.Name == player_name.get(); });
+
+    if(it != players.end()) {
+        it->Terro_secondary = terro_secondary[get_rand_int(0, 6)];
+        it->Ct_secondary = ct_secondary[get_rand_int(0, 7)];
+
+        if(get_rand_int(0, 1999) == 69)
+            it->Terro_primary = "Zeus x27";
+        else
+            it->Terro_primary = terro_primary[get_rand_int(0, 16)];
+
+        if(get_rand_int(0, 1999) == 420)
+            it->Ct_primary = "Zeus x27";
+        else
+            it->Ct_primary = ct_primary[get_rand_int(0, 17)];
+
+        //printing
+        std::cout << it->Name << ": \nt:  " << it->Terro_secondary << ", " << it->Terro_primary
+                              << "\nct: " << it->Ct_secondary << ", " << it->Ct_primary << "\n\n";
+    }
+    else {
+        std::cerr << "Player not found\n";
+    }
     std::cout << "\n";
 }
 
@@ -263,7 +308,7 @@ int main() {
     string n;
     srand(time(nullptr));
     while(true) {
-        std::cout << "Choose option(exit - exit program; add - add players; del - delete player; 1 - randomise weapons for everyone separately; 2 - randomise weapons for everyone together; 3 - randomise team; 4 - randomise map)\n";
+        std::cout << "Choose option(exit - exit program; add - add players; del - delete player; 1 - randomise weapons for everyone separately; 2 - randomise weapons for everyone together; 3 - randomise weapons for one person; 4 - randomise team; 5 - randomise map)\n";
         std::cin >> n;
 
         if(n.compare("exit") == 0)      return 0;
@@ -271,8 +316,9 @@ int main() {
         else if(n.compare("del") == 0)  del_player();
         else if(n.compare("1") == 0)    rand_weapons_separately();
         else if(n.compare("2") == 0)    rand_weapons_together();
-        else if(n.compare("3") == 0)    rand_team();
-        else if(n.compare("4") == 0)    rand_maps();
+        else if(n.compare("3") == 0)    rand_weapons_individualy();
+        else if(n.compare("4") == 0)    rand_team();
+        else if(n.compare("5") == 0)    rand_maps();
         else                            std::cerr << "invalid option\n";
     }
 }

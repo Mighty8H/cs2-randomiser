@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <array>
 #include <vector>
 #include <string>
 #include <random>
@@ -8,7 +9,7 @@
 #include <cmath>
 #include "cs2_randomiser.hpp"
 
-using std::string;
+using string = std::string;
 
 const uint8_t name_length = 255;
 uint16_t temp_num_players;
@@ -20,14 +21,9 @@ struct Player {
     string Terro_primary;
     string Ct_primary;
     bool Team_ct = false;
-    
 };
 
 std::vector<Player> players;
-
-bool in_array(const std::string& value, const std::vector<std::string>& array) {
-    return std::find(array.begin(), array.end(), value) != array.end();
-}
 
 bool is_integer(const std::string& str) {
     try {
@@ -45,10 +41,10 @@ int get_rand_int(int min, int max) {
 }
 
 void add_players() {
-    string str_num_players;
-
-    std::cout << "\n";
+    std::cout << "\n-----------------------------------\n";
     std::cin.ignore();
+
+    string str_num_players;
     do {
         std::cout << "Enter number of players ";
         std::cin >> str_num_players;
@@ -78,11 +74,11 @@ void add_players() {
         p.Name = (temp_text.get() ? temp_text.get() : "");
         players.emplace_back(p);
     }
-    std::cout << "\n";
+    std::cout << "-----------------------------------\n\n";
 }
 
 void del_player() {
-    std::cout << "\n";
+    std::cout << "\n-----------------------------------\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
@@ -110,30 +106,32 @@ void del_player() {
     else {
         std::cerr << "Player not found\n";
     }
-    std::cout << "\n";
+    std::cout << "-----------------------------------\n\n";
 }
 
 void rand_weapons_separately() {
-    std::cout << "\n";
+    std::cout << "\n-----------------------------------\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
     }
 
+    std::cin.ignore();
+
     //randomising weapons for players
     for(size_t i = 0; i < players.size(); i++) {
-        players[i].Terro_secondary = terro_secondary[get_rand_int(0, 6)];
-        players[i].Ct_secondary = ct_secondary[get_rand_int(0, 7)];
+        players[i].Terro_secondary = terro_secondary[get_rand_int(0, terro_secondary.size()-1)];
+        players[i].Ct_secondary = ct_secondary[get_rand_int(0, ct_secondary.size()-1)];
 
         if(get_rand_int(0, 1999) == 69)
             players[i].Terro_primary = "Zeus x27";
         else
-            players[i].Terro_primary = terro_primary[get_rand_int(0, 16)];
+            players[i].Terro_primary = terro_primary[get_rand_int(0, terro_primary.size()-1)];
 
         if(get_rand_int(0, 1999) == 420)
             players[i].Ct_primary = "Zeus x27";
         else
-            players[i].Ct_primary = ct_primary[get_rand_int(0, 17)];
+            players[i].Ct_primary = ct_primary[get_rand_int(0, ct_primary.size()-1)];
     }
 
     //printing
@@ -141,71 +139,118 @@ void rand_weapons_separately() {
         std::cout << players[i].Name << ": \nt:  " << players[i].Terro_secondary << ", " << players[i].Terro_primary
                                      << "\nct: " << players[i].Ct_secondary << ", " << players[i].Ct_primary << "\n\n";
     }
-    std::cout << "\n";
+    std::cout << "-----------------------------------\n\n";
 }
 
 void rand_weapons_together() {
-    std::cout << "\n";
+    std::cout << "\n-----------------------------------\n";
 
     std::cin.ignore();
 
-    string rand_gun;
-    std::vector<string> t_arr(5);   //terrorist
-    std::vector<string> ct_arr(5);  //counter-terrorists
+    string rand_weapon, tmp_input;
+    uint8_t t_sec_num, t_prim_num, ct_sec_num, ct_prim_num;
+    uint8_t iter_t_sec = 0;
+    uint8_t iter_t_prim = 0;
+    uint8_t iter_ct_sec = 0;
+    uint8_t iter_ct_prim = 0;
 
-    //randomising weapons for t
-    t_arr[0] = terro_secondary[get_rand_int(0, 6)];
-    while(t_arr[1].empty()) {
-        rand_gun = terro_secondary[get_rand_int(0, 6)];
+    //entering the number of weapons to be randomised
+    do {
+        std::cout << "Enter number of terrorist secondary weapons ";
+        std::cin >> tmp_input;
+    }
+    while(is_integer(tmp_input));
+    t_sec_num = std::min<uint8_t>(std::stoi(tmp_input), terro_secondary.size());
 
-        if(!in_array(rand_gun, t_arr)) {
-            t_arr[1] = rand_gun;
-        }
+    do {
+        std::cout << "Enter number of terrorist primary weapons ";
+        std::cin >> tmp_input;
+    }
+    while(is_integer(tmp_input));
+    t_prim_num = std::min<uint8_t>(std::stoi(tmp_input), terro_primary.size());
+
+    do {
+        std::cout << "Enter number of counter-terrorist secondary weapons ";
+        std::cin >> tmp_input;
+    }
+    while(is_integer(tmp_input));
+    ct_sec_num = std::min<uint8_t>(std::stoi(tmp_input), ct_secondary.size());
+
+    do {
+        std::cout << "Enter number of counter-terrorist primary weapons ";
+        std::cin >> tmp_input;
+    }
+    while(is_integer(tmp_input));
+    ct_prim_num = std::min<uint8_t>(std::stoi(tmp_input), ct_primary.size());
+    
+    std::array<string, terro_secondary.size()> terro_sec_copy  = terro_secondary;
+    std::array<string, terro_primary.size()>   terro_prim_copy = terro_primary;
+    std::array<string, ct_secondary.size()>    ct_sec_copy     = ct_secondary;
+    std::array<string, ct_primary.size()>      ct_prim_copy    = ct_primary;
+    
+    std::cout << "\nterrorists:\n";
+    std::cout << "secondary: ";
+    for(size_t i = 0; i < t_sec_num; i++) {
+        rand_weapon = terro_sec_copy[get_rand_int(0, terro_sec_copy.size()-1 - iter_t_sec)];
+        
+        std::cout << rand_weapon;
+        if(i < t_sec_num-1)
+            std::cout << ", ";
+        else
+            std::cout << ";\n";
+        
+        std::remove(terro_sec_copy.begin(), terro_sec_copy.end(), rand_weapon);
+        iter_t_sec++;
     }
 
-    t_arr[2] = terro_primary[get_rand_int(0, 16)];
-    while(t_arr[3].empty() || t_arr[4].empty()) {
-        rand_gun = terro_primary[get_rand_int(0, 16)];
+    std::cout << "primary: ";
+    for(size_t i = 0; i < t_prim_num; i++) {
+        rand_weapon = terro_prim_copy[get_rand_int(0, terro_prim_copy.size()-1 - iter_t_prim)];
 
-        if(t_arr[3].empty() && !in_array(rand_gun, t_arr)) {
-            t_arr[3] = rand_gun;
-        }
-        else if(!in_array(rand_gun, t_arr)) {
-            t_arr[4] = rand_gun;
-        }
+        std::cout << rand_weapon;
+        if(i < t_prim_num-1)
+            std::cout << ", ";
+        else
+            std::cout << ";\n";
+        
+        std::remove(terro_prim_copy.begin(), terro_prim_copy.end(), rand_weapon);
+        iter_t_prim++;
     }
 
-    //randomising weapons for ct_arr
-    ct_arr[0] = ct_secondary[get_rand_int(0, 7)];
-    while(ct_arr[1].empty()) {
-        rand_gun = ct_secondary[get_rand_int(0, 7)];
+    std::cout << "\ncounter-terrorists:\n";
+    std::cout << "secondary: ";
+    for(size_t i = 0; i < ct_sec_num; i++) {
+        rand_weapon = ct_sec_copy[get_rand_int(0, ct_sec_copy.size()-1 - iter_ct_sec)];
 
-        if(!in_array(rand_gun, ct_arr)) {
-            ct_arr[1] = rand_gun;
-        }
-    }
-
-    ct_arr[2] = ct_primary[get_rand_int(0, 17)];
-    while(ct_arr[3].empty() || ct_arr[4].empty()) {
-        rand_gun = ct_primary[get_rand_int(0, 17)];
-
-        if(ct_arr[3].empty() && !in_array(rand_gun, ct_arr)) {
-            ct_arr[3] = rand_gun;
-        }
-        else if(!in_array(rand_gun, ct_arr)) {
-            ct_arr[4] = rand_gun;
-        }
+        std::cout << rand_weapon;
+        if(i < ct_sec_num-1)
+            std::cout << ", ";
+        else
+            std::cout << ";\n";
+        
+        std::remove(ct_sec_copy.begin(), ct_sec_copy.end(), rand_weapon);
+        iter_ct_sec++;
     }
     
-    //printing
-    std::cout << "t:  " << t_arr[0] << ", " << t_arr[1] << "; " << t_arr[2] << ", " << t_arr[3] << ", " << t_arr[4] << "\n"
-              << "ct: " << ct_arr[0] << ", " << ct_arr[1] << "; " << ct_arr[2] << ", " << ct_arr[3] << ", " << ct_arr[4] << "\n";
-    
-    std::cout << "\n";
+    std::cout << "primary: ";
+    for(size_t i = 0; i < ct_prim_num; i++) {
+        rand_weapon =  ct_prim_copy[get_rand_int(0, ct_prim_copy.size()-1 - iter_ct_prim)];
+
+        std::cout << rand_weapon;
+        if(i < ct_prim_num-1)
+            std::cout << ", ";
+        else
+            std::cout << ";\n";
+        
+        std::remove(ct_prim_copy.begin(), ct_prim_copy.end(), rand_weapon);
+        iter_ct_prim++;
+    }
+
+    std::cout << "-----------------------------------\n\n";
 }
 
 void rand_weapons_individualy() {
-    std::cout << "\n";
+    std::cout << "\n-----------------------------------\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
@@ -213,7 +258,7 @@ void rand_weapons_individualy() {
 
     std::cin.ignore();
 
-    std::unique_ptr<char[]> player_name(new char[name_length]);
+    std::unique_ptr<char[]> player_name = std::make_unique<char[]>(name_length);
 
     std::cout << "Enter the name of the player you want to roll for:\n";
     for(const auto& player : players) {
@@ -226,31 +271,31 @@ void rand_weapons_individualy() {
         [&](const Player& p) { return p.Name == player_name.get(); });
 
     if(it != players.end()) {
-        it->Terro_secondary = terro_secondary[get_rand_int(0, 6)];
-        it->Ct_secondary = ct_secondary[get_rand_int(0, 7)];
+        it->Terro_secondary = terro_secondary[get_rand_int(0, terro_secondary.size()-1)];
+        it->Ct_secondary = ct_secondary[get_rand_int(0, ct_secondary.size()-1)];
 
         if(get_rand_int(0, 1999) == 69)
             it->Terro_primary = "Zeus x27";
         else
-            it->Terro_primary = terro_primary[get_rand_int(0, 16)];
+            it->Terro_primary = terro_primary[get_rand_int(0, terro_primary.size()-1)];
 
         if(get_rand_int(0, 1999) == 420)
             it->Ct_primary = "Zeus x27";
         else
-            it->Ct_primary = ct_primary[get_rand_int(0, 17)];
+            it->Ct_primary = ct_primary[get_rand_int(0, ct_primary.size()-1)];
 
         //printing
-        std::cout << it->Name << ": \nt:  " << it->Terro_secondary << ", " << it->Terro_primary
-                              << "\nct: " << it->Ct_secondary << ", " << it->Ct_primary << "\n\n";
+        std::cout << "\n" << it->Name << ": \nt:  " << it->Terro_secondary << ", " << it->Terro_primary
+                                      << "\nct: " << it->Ct_secondary << ", " << it->Ct_primary << "\n";
     }
     else {
         std::cerr << "Player not found\n";
     }
-    std::cout << "\n";
+    std::cout << "-----------------------------------\n\n";
 }
 
 void rand_team() {
-    std::cout << "\n";
+    std::cout << "\n-----------------------------------\n";
     if(players.empty()) {
         std::cerr << "no player exists\n";
         return;
@@ -265,9 +310,9 @@ void rand_team() {
 
     //determinate if round up or down
     if(get_rand_int(0, 1))
-        half_of_players = floor((float)players.size()/2);
+        half_of_players = floor((float)players.size() / 2);
     else
-        half_of_players = ceil((float)players.size()/2);
+        half_of_players = ceil((float)players.size() / 2);
 
     //set first player to team ct
     int rand_player = get_rand_int(0, players.size()-1);
@@ -297,18 +342,28 @@ void rand_team() {
         if(!players[i].Team_ct)
             std::cout << players[i].Name << "\n";
     }
-    std::cout << "\n";
+    std::cout << "-----------------------------------\n\n";
 }
 
 void rand_maps() {
-    std::cout << "\n" << maps[get_rand_int(0, 13)] << "\n\n";
+    std::cout << "\n-----------------------------------\n";
+    std::cout << maps[get_rand_int(0, maps.size()-1)] << "\n";
+    std::cout << "-----------------------------------\n\n";
 }
 
 int main() {
     string n;
     srand(time(nullptr));
     while(true) {
-        std::cout << "Choose option(exit - exit program; add - add players; del - delete player; 1 - randomise weapons for everyone separately; 2 - randomise weapons for everyone together; 3 - randomise weapons for one person; 4 - randomise team; 5 - randomise map)\n";
+        std::cout << "Choose option\n" 
+                  << "exit - exit program\n" 
+                  << "add - add players\n" 
+                  << "del - delete player\n" 
+                  << "1 - randomise weapons for everyone separately\n"
+                  << "2 - randomise weapons for everyone together\n"
+                  << "3 - randomise weapons for one person\n"
+                  << "4 - randomise team\n"
+                  << "5 - randomise map\n";
         std::cin >> n;
 
         if(n.compare("exit") == 0)      return 0;

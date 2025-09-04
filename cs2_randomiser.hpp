@@ -9,12 +9,13 @@ const std::array<std::string, 17> terro_primary = { "MAC-10", "MP7", "MP5-SD", "
 const std::array<std::string, 18> ct_primary = { "MP9", "MP7", "MP5-SD", "UMP-45", "P90", "PP-Bizon", "Nova", "XM1014", "MAG-7", "M249", "Negev", "FAMAS", "M4A4", "M4A1-S", "SSG 08", "AUG", "AWP", "SCAR-20" };
 const std::array<std::string, 14> maps = { "Dust II", "Mirage", "Vertigo", "Ancient", "Inferno", "Nuke", "Train", "Anubis", "Overpass", "Jura", "Grail", "Agency", "Office", "Italy" };
 
-bool in_array(const std::string& value, const std::vector<std::string>& array);
 bool is_integer(const std::string& str);
 int get_rand_int(int min, int max);
+uint8_t get_weapon_count(const std::string& prompt, size_t max_size);
 void add_players();
 void del_player();
 void rand_weapons_separately();
 void rand_weapons_together();
+void rand_weapons_individualy();
 void rand_team();
 void rand_maps();
